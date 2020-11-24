@@ -9,6 +9,30 @@ namespace TAFL
             S,
             Identifier,
             Number,
+            Float,
+            Addition,   //сложение
+            Subtraction,    //вычитание
+            Multiplication,
+            Division,
+            Assignment,     //присваивание
+            OpeningBracket,
+            ClosingBracket,
+            EndOfOperation,
+            OpeningSquareBracket,
+            ClosingSquareBracket,
+            Сomma,          //запятая
+            Not,        // !
+            More,       //>
+            Less,       //<
+            Or,
+            And,
+            Begin,
+            End,
+            EndSign,    //знак конца Ʇ (перевернутая Т) 
+            Equality,   // ==
+            NotEqual,   // !=
+            MoreOrEqual,     // >=
+            LessOrEqual,
             Z,
             Error
         }
