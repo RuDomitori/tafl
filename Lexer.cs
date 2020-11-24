@@ -10,24 +10,24 @@ namespace TAFL
             Identifier,
             Number,
             Float,
-            Addition,   //сложение
+            Summationn,   //сложение
             Subtraction,    //вычитание
             Multiplication,
             Division,
             Assignment,     //присваивание
-            OpeningBracket,
-            ClosingBracket,
-            EndOfOperation,
-            OpeningSquareBracket,
-            ClosingSquareBracket,
-            Сomma,          //запятая
+            LeftRoundBracket,
+            RightRoundgBracket,
+            EndOfOperation,     // ;
+            LeftSquareBracket,
+            RightSquareBracket,
+            Comma,          //запятая
             Not,        // !
             More,       //>
             Less,       //<
             Or,
             And,
-            Begin,
-            End,
+            LeftCurleBracket,    // {
+            RightCurleBracket,    // }
             EndSign,    //знак конца Ʇ (перевернутая Т) 
             Equality,   // ==
             NotEqual,   // !=
@@ -41,19 +41,59 @@ namespace TAFL
         {
             Letter,
             Digit,
-            Underscores,
-            End,
-            Unknown
+            Underline,
+            EndSign,    //знак конца Ʇ (перевернутая Т) 
+            Unknown,
+            Space,
+            Summation,   //сложение
+            Subtraction,    //вычитание
+            Multiplication,
+            Division,
+            Assignment,  //присваивание
+            LeftRoundBracket,
+            RightRoundgBracket,
+            Semicolon,     // ;
+            LeftSquareBracket,
+            RightSquareBracket,
+            Comma,          //запятая
+            Not,        // !
+            More,       //>
+            Less,       //<
+            Or,
+            And,
+            LeftCurleBracket,    // {
+            RightCurleBracket,
+            Z,
+            Error
         }
 
         private static CharType TypeOf(char ch)
         {
             if (char.IsLetter(ch)) return CharType.Letter;
             if (char.IsDigit(ch)) return CharType.Digit;
+            if (char.IsWhiteSpace(ch)) return CharType.Space;
             return ch switch
             {
-                '_' => CharType.Underscores,
-                _ => CharType.Unknown
+                '+' => CharType.Summation,
+                '-' => CharType.Subtraction,
+                '*' => CharType.Multiplication,
+                '/' => CharType.Division,
+                '=' => CharType.Assignment,
+                '(' => CharType.LeftRoundBracket,
+                ')' => CharType.RightRoundgBracket,
+                ';' => CharType.Semicolon,
+                '[' => CharType.LeftSquareBracket,
+                ']' => CharType.RightSquareBracket,
+                ',' => CharType.Comma,
+                '!' => CharType.Not,
+                '>' => CharType.More,
+                '<' => CharType.Less,
+                '|' => CharType.Or,
+                '&' => CharType.And,
+                '{' => CharType.LeftCurleBracket,
+                '}' => CharType.RightCurleBracket,
+                '_' => CharType.Underline,
+                 _  => CharType.Unknown,
             };
         }
 
@@ -120,7 +160,7 @@ namespace TAFL
             }
 
             if (currentState == State.S) return lexemes;
-            switch (_table[(int) currentState, (int) CharType.End])
+            switch (_table[(int) currentState, (int) CharType.EndSign])
             {
                 case State.Z:
                     lexemes.Add(
