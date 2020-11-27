@@ -9,62 +9,62 @@ namespace TAFL
             S,
             Identifier,
             Number,
+            Float1,
             Float,
-            Summationn,   //сложение
+            Summation,   //сложение
             Subtraction,    //вычитание
             Multiplication,
             Division,
             Assignment,     //присваивание
             LeftRoundBracket,
-            RightRoundgBracket,
+            RightRoundBracket,
             EndOfOperation,     // ;
             LeftSquareBracket,
             RightSquareBracket,
             Comma,          //запятая
             Not,        // !
-            More,       //>
-            Less,       //<
+            GreaterThan,       //>
+            LessThan,       //<
             Or,
             And,
-            LeftCurleBracket,    // {
-            RightCurleBracket,    // }
-            EndSign,    //знак конца Ʇ (перевернутая Т) 
-            Equality,   // ==
-            NotEqual,   // !=
-            MoreOrEqual,     // >=
-            LessOrEqual,
+            LeftCurlyBracket,    // {
+            RightCurlyBracket,    // }
+            EqualTo,   // ==
+            NotEqualTo,   // !=
+            GreaterThanOrEqualTo,     // >=
+            LessThanOrEqualTo,
             Z,
-            Error
+            Error,
+            End,
         }
 
         private enum CharType
         {
             Letter,
             Digit,
-            Underline,
-            EndSign,    //знак конца Ʇ (перевернутая Т) 
-            Unknown,
             Space,
-            Summation,   //сложение
-            Subtraction,    //вычитание
-            Multiplication,
-            Division,
-            Assignment,  //присваивание
-            LeftRoundBracket,
-            RightRoundgBracket,
+            Underscore, // _
+            Summation,   // +
+            Subtraction,    // -
+            Multiplication, // *
+            Division,  // /
+            Assignment,  // =
+            LeftRoundBracket, // (
+            RightRoundBracket, // )
             Semicolon,     // ;
-            LeftSquareBracket,
-            RightSquareBracket,
-            Comma,          //запятая
-            Not,        // !
-            More,       //>
-            Less,       //<
-            Or,
-            And,
-            LeftCurleBracket,    // {
-            RightCurleBracket,
-            Z,
-            Error
+            LeftSquareBracket, // [
+            RightSquareBracket, // ]
+            Comma,          // ,
+            ExclamationMark,        // !
+            Greater,       // >
+            Less,       // <
+            VerticalSlash, // |
+            Ampersand, // &
+            LeftCurlyBracket,    // {
+            RightCurlyBracket, // }
+            Dot, // .
+            End,    // EoF
+            Unknown
         }
 
         private static CharType TypeOf(char ch)
@@ -80,35 +80,101 @@ namespace TAFL
                 '/' => CharType.Division,
                 '=' => CharType.Assignment,
                 '(' => CharType.LeftRoundBracket,
-                ')' => CharType.RightRoundgBracket,
+                ')' => CharType.RightRoundBracket,
                 ';' => CharType.Semicolon,
                 '[' => CharType.LeftSquareBracket,
                 ']' => CharType.RightSquareBracket,
                 ',' => CharType.Comma,
-                '!' => CharType.Not,
-                '>' => CharType.More,
+                '!' => CharType.ExclamationMark,
+                '>' => CharType.Greater,
                 '<' => CharType.Less,
-                '|' => CharType.Or,
-                '&' => CharType.And,
-                '{' => CharType.LeftCurleBracket,
-                '}' => CharType.RightCurleBracket,
-                '_' => CharType.Underline,
+                '|' => CharType.VerticalSlash,
+                '&' => CharType.Ampersand,
+                '{' => CharType.LeftCurlyBracket,
+                '}' => CharType.RightCurlyBracket,
+                '_' => CharType.Underscore,
+                '.' => CharType.Dot,
                  _  => CharType.Unknown,
             };
         }
 
-        private delegate Lexeme LexemeBuilder(int line, int start, string word);
+        private delegate Lexeme SemanticAction(int line, int start, int end, string word);
 
-        private static LexemeBuilder[] _lexemeBuilders =
+        private static readonly SemanticAction[] SemanticActions =
         {
             null,
-            (line, start, word) => new Lexeme.Identifier(line, start, word), 
+            (line, start, end, word) => word switch
+            {
+                "read" => new Lexeme.Read(line, start, end),
+                "write" => new Lexeme.Write(line, start, end),
+                "while" => new Lexeme.While(line, start, end),
+                "if" => new Lexeme.If(line, start, end),
+                "else" => new Lexeme.Else(line, start, end),
+                "fn" => new Lexeme.Fn(line, start, end),
+                "return" => new Lexeme.Return(line, start, end),
+                "var" => new Lexeme.Var(line, start, end),
+                "null" => new Lexeme.Null(line, start, end),
+                "false" => new Lexeme.False(line, start, end),
+                "true" => new Lexeme.True(line, start, end),
+                _ => new Lexeme.Identifier(line, start, end, word)
+            },
+            (line, start, end, word) => new Lexeme.Const(line, start, end, word),
+            (line, start, end, word) => new Lexeme.Const(line, start, end, word),
+            (line, start, end, word) => new Lexeme.Summation(line, start, end),
+            (line, start, end, word) => new Lexeme.Subtraction(line, start, end),
+            (line, start, end, word) => new Lexeme.Multiplication(line, start, end),
+            (line, start, end, word) => new Lexeme.Division(line, start, end),
+            (line, start, end, word) => new Lexeme.Assignment(line, start, end),
+            (line, start, end, word) => new Lexeme.LeftRoundBracket(line, start, end),
+            (line, start, end, word) => new Lexeme.RightRoundBracket(line, start, end),
+            (line, start, end, word) => new Lexeme.Semicolon(line, start, end),
+            (line, start, end, word) => new Lexeme.LeftSquareBracket(line, start, end),
+            (line, start, end, word) => new Lexeme.RightSquareBracket(line, start, end),
+            (line, start, end, word) => new Lexeme.Comma(line, start, end),
+            (line, start, end, word) => new Lexeme.Not(line, start, end),
+            (line, start, end, word) => new Lexeme.GreaterThan(line, start, end),
+            (line, start, end, word) => new Lexeme.LessThan(line, start, end),
+            (line, start, end, word) => new Lexeme.Or(line, start, end),
+            (line, start, end, word) => new Lexeme.And(line, start, end),
+            (line, start, end, word) => new Lexeme.LeftCurlyBracket(line, start, end),
+            (line, start, end, word) => new Lexeme.RightCurlyBracket(line, start, end),
+            (line, start, end, word) => new Lexeme.EqualTo(line, start, end),
+            (line, start, end, word) => new Lexeme.NotEqualTo(line, start, end),
+            (line, start, end, word) => new Lexeme.GreaterThanOrEqualTo(line, start, end),
+            (line, start, end, word) => new Lexeme.LessThanOrEqualTo(line, start, end),
+            (line, start, end, word) => new Lexeme.Error(line, start, end, "Неверно задано число"),
+            (line, start, end, word) => new Lexeme.Error(line, start, end, "Символ неопознан"),
         };
-        
-        private static readonly State[,] _table =
+
+        private static readonly (int, int, bool)[,] _table =
         {
-            {State.Identifier, State.Number},
-            {State.Identifier, State.Identifier}
+            {( 1, 0, false ),	( 2, 0, false ),	( 27, 0, false ),	( 1, 0, false ),	( 5, 0, false ),	( 6, 0, false ),	( 7, 0, false ),	( 8, 0, false ),	( 9, 0, false ),	( 10, 0, false ),	( 11, 0, false ),	( 12, 0, false ),	( 13, 0, false ),	( 14, 0, false ),	( 15, 0, false ),	( 16, 0, false ),	( 17, 0, false ),	( 18, 0, false ),	( 19, 0, false ),	( 20, 0, false ),	( 21, 0, false ),	( 22, 0, false ),	( 28, 26, false ),	( 27, 0, false ),	( 28, 27, false )},
+            {( 1, 0, false ),	( 1, 0, false ),	( 27, 1, false ),	( 1, 0, false ),	( 27, 1, true ),	( 27, 1, true ),	( 27, 1, true ),	( 27, 1, true ),	( 27, 1, true ),	( 27, 1, true ),	( 27, 1, true ),	( 27, 1, true ),	( 27, 1, true ),	( 27, 1, true ),	( 27, 1, true ),	( 27, 1, true ),	( 27, 1, true ),	( 27, 1, true ),	( 27, 1, true ),	( 27, 1, true ),	( 27, 1, true ),	( 27, 1, true ),	( 27, 1, true ),	( 27, 1, false ),	( 28, 27, false )},
+            {( 27, 2, true ),	( 2, 0, false ),	( 27, 2, false ),	( 27, 2, true ),	( 27, 2, true ),	( 27, 2, true ),	( 27, 2, true ),	( 27, 2, true ),	( 27, 2, true ),	( 27, 2, true ),	( 27, 2, true ),	( 27, 2, true ),	( 27, 2, true ),	( 27, 2, true ),	( 27, 2, true ),	( 27, 2, true ),	( 27, 2, true ),	( 27, 2, true ),	( 27, 2, true ),	( 27, 2, true ),	( 27, 2, true ),	( 27, 2, true ),	( 3, 0, false ),	( 27, 2, false ),	( 28, 27, false )},
+            {( 28, 26, true ),	( 4, 0, false ),	( 28, 26, false ),	( 28, 26, true ),	( 28, 26, true ),	( 28, 26, true ),	( 28, 26, true ),	( 28, 26, true ),	( 28, 26, true ),	( 28, 26, true ),	( 28, 26, true ),	( 28, 26, true ),	( 28, 26, true ),	( 28, 26, true ),	( 28, 26, true ),	( 28, 26, true ),	( 28, 26, true ),	( 28, 26, true ),	( 28, 26, true ),	( 28, 26, true ),	( 28, 26, true ),	( 28, 26, true ),	( 28, 26, true ),	( 28, 26, false ),	( 28, 26, false )},
+            {( 27, 3, true ),	( 4, 0, false ),	( 27, 3, false ),	( 27, 3, true ),	( 27, 3, true ),	( 27, 3, true ),	( 27, 3, true ),	( 27, 3, true ),	( 27, 3, true ),	( 27, 3, true ),	( 27, 3, true ),	( 27, 3, true ),	( 27, 3, true ),	( 27, 3, true ),	( 27, 3, true ),	( 27, 3, true ),	( 27, 3, true ),	( 27, 3, true ),	( 27, 3, true ),	( 27, 3, true ),	( 27, 3, true ),	( 27, 3, true ),	( 27, 3, true ),	( 27, 3, false ),	( 28, 27, false )},
+            {( 27, 4, true ),	( 27, 4, true ),	( 27, 4, false ),	( 27, 4, true ),	( 27, 4, true ),	( 27, 4, true ),	( 27, 4, true ),	( 27, 4, true ),	( 27, 4, true ),	( 27, 4, true ),	( 27, 4, true ),	( 27, 4, true ),	( 27, 4, true ),	( 27, 4, true ),	( 27, 4, true ),	( 27, 4, true ),	( 27, 4, true ),	( 27, 4, true ),	( 27, 4, true ),	( 27, 4, true ),	( 27, 4, true ),	( 27, 4, true ),	( 27, 4, true ),	( 27, 4, false ),	( 28, 27, false )},
+            {( 27, 5, true ),	( 27, 5, true ),	( 27, 5, false ),	( 27, 5, true ),	( 27, 5, true ),	( 27, 5, true ),	( 27, 5, true ),	( 27, 5, true ),	( 27, 5, true ),	( 27, 5, true ),	( 27, 5, true ),	( 27, 5, true ),	( 27, 5, true ),	( 27, 5, true ),	( 27, 5, true ),	( 27, 5, true ),	( 27, 5, true ),	( 27, 5, true ),	( 27, 5, true ),	( 27, 5, true ),	( 27, 5, true ),	( 27, 5, true ),	( 27, 5, true ),	( 27, 5, false ),	( 28, 27, false )},
+            {( 27, 6, true ),	( 27, 6, true ),	( 27, 6, false ),	( 27, 6, true ),	( 27, 6, true ),	( 27, 6, true ),	( 27, 6, true ),	( 27, 6, true ),	( 27, 6, true ),	( 27, 6, true ),	( 27, 6, true ),	( 27, 6, true ),	( 27, 6, true ),	( 27, 6, true ),	( 27, 6, true ),	( 27, 6, true ),	( 27, 6, true ),	( 27, 6, true ),	( 27, 6, true ),	( 27, 6, true ),	( 27, 6, true ),	( 27, 6, true ),	( 27, 6, true ),	( 27, 6, false ),	( 28, 27, false )},
+            {( 27, 7, true ),	( 27, 7, true ),	( 27, 7, false ),	( 27, 7, true ),	( 27, 7, true ),	( 27, 7, true ),	( 27, 7, true ),	( 27, 7, true ),	( 27, 7, true ),	( 27, 7, true ),	( 27, 7, true ),	( 27, 7, true ),	( 27, 7, true ),	( 27, 7, true ),	( 27, 7, true ),	( 27, 7, true ),	( 27, 7, true ),	( 27, 7, true ),	( 27, 7, true ),	( 27, 7, true ),	( 27, 7, true ),	( 27, 7, true ),	( 27, 7, true ),	( 27, 7, false ),	( 28, 27, false )},
+            {( 27, 8, true ),	( 27, 8, true ),	( 27, 8, false ),	( 27, 8, true ),	( 27, 8, true ),	( 27, 8, true ),	( 27, 8, true ),	( 27, 8, true ),	( 23, 0, false ),	( 27, 8, true ),	( 27, 8, true ),	( 27, 8, true ),	( 27, 8, true ),	( 27, 8, true ),	( 27, 8, true ),	( 27, 8, true ),	( 27, 8, true ),	( 27, 8, true ),	( 27, 8, true ),	( 27, 8, true ),	( 27, 8, true ),	( 27, 8, true ),	( 27, 8, true ),	( 27, 8, false ),	( 28, 27, false )},
+            {( 27, 9, true ),	( 27, 9, true ),	( 27, 9, false ),	( 27, 9, true ),	( 27, 9, true ),	( 27, 9, true ),	( 27, 9, true ),	( 27, 9, true ),	( 27, 9, true ),	( 27, 9, true ),	( 27, 9, true ),	( 27, 9, true ),	( 27, 9, true ),	( 27, 9, true ),	( 27, 9, true ),	( 27, 9, true ),	( 27, 9, true ),	( 27, 9, true ),	( 27, 9, true ),	( 27, 9, true ),	( 27, 9, true ),	( 27, 9, true ),	( 27, 9, true ),	( 27, 9, false ),	( 28, 27, false )},
+            {( 27, 10, true ),	( 27, 10, true ),	( 27, 10, false ),	( 27, 10, true ),	( 27, 10, true ),	( 27, 10, true ),	( 27, 10, true ),	( 27, 10, true ),	( 27, 10, true ),	( 27, 10, true ),	( 27, 10, true ),	( 27, 10, true ),	( 27, 10, true ),	( 27, 10, true ),	( 27, 10, true ),	( 27, 10, true ),	( 27, 10, true ),	( 27, 10, true ),	( 27, 10, true ),	( 27, 10, true ),	( 27, 10, true ),	( 27, 10, true ),	( 27, 10, true ),	( 27, 10, false ),	( 28, 27, false )},
+            {( 27, 11, true ),	( 27, 11, true ),	( 27, 11, false ),	( 27, 11, true ),	( 27, 11, true ),	( 27, 11, true ),	( 27, 11, true ),	( 27, 11, true ),	( 27, 11, true ),	( 27, 11, true ),	( 27, 11, true ),	( 27, 11, true ),	( 27, 11, true ),	( 27, 11, true ),	( 27, 11, true ),	( 27, 11, true ),	( 27, 11, true ),	( 27, 11, true ),	( 27, 11, true ),	( 27, 11, true ),	( 27, 11, true ),	( 27, 11, true ),	( 27, 11, true ),	( 27, 11, false ),	( 28, 27, false )},
+            {( 27, 12, true ),	( 27, 12, true ),	( 27, 12, false ),	( 27, 12, true ),	( 27, 12, true ),	( 27, 12, true ),	( 27, 12, true ),	( 27, 12, true ),	( 27, 12, true ),	( 27, 12, true ),	( 27, 12, true ),	( 27, 12, true ),	( 27, 12, true ),	( 27, 12, true ),	( 27, 12, true ),	( 27, 12, true ),	( 27, 12, true ),	( 27, 12, true ),	( 27, 12, true ),	( 27, 12, true ),	( 27, 12, true ),	( 27, 12, true ),	( 27, 12, true ),	( 27, 12, false ),	( 28, 27, false )},
+            {( 27, 13, true ),	( 27, 13, true ),	( 27, 13, false ),	( 27, 13, true ),	( 27, 13, true ),	( 27, 13, true ),	( 27, 13, true ),	( 27, 13, true ),	( 27, 13, true ),	( 27, 13, true ),	( 27, 13, true ),	( 27, 13, true ),	( 27, 13, true ),	( 27, 13, true ),	( 27, 13, true ),	( 27, 13, true ),	( 27, 13, true ),	( 27, 13, true ),	( 27, 13, true ),	( 27, 13, true ),	( 27, 13, true ),	( 27, 13, true ),	( 27, 13, true ),	( 27, 13, false ),	( 28, 27, false )},
+            {( 27, 14, true ),	( 27, 14, true ),	( 27, 14, false ),	( 27, 14, true ),	( 27, 14, true ),	( 27, 14, true ),	( 27, 14, true ),	( 27, 14, true ),	( 27, 14, true ),	( 27, 14, true ),	( 27, 14, true ),	( 27, 14, true ),	( 27, 14, true ),	( 27, 14, true ),	( 27, 14, true ),	( 27, 14, true ),	( 27, 14, true ),	( 27, 14, true ),	( 27, 14, true ),	( 27, 14, true ),	( 27, 14, true ),	( 27, 14, true ),	( 27, 14, true ),	( 27, 14, false ),	( 28, 27, false )},
+            {( 27, 15, true ),	( 27, 15, true ),	( 27, 15, false ),	( 27, 15, true ),	( 27, 15, true ),	( 27, 15, true ),	( 27, 15, true ),	( 27, 15, true ),	( 24, 0, false ),	( 27, 15, true ),	( 27, 15, true ),	( 27, 15, true ),	( 27, 15, true ),	( 27, 15, true ),	( 27, 15, true ),	( 27, 15, true ),	( 27, 15, true ),	( 27, 15, true ),	( 27, 15, true ),	( 27, 15, true ),	( 27, 15, true ),	( 27, 15, true ),	( 27, 15, true ),	( 27, 15, false ),	( 28, 27, false )},
+            {( 27, 16, true ),	( 27, 16, true ),	( 27, 16, false ),	( 27, 16, true ),	( 27, 16, true ),	( 27, 16, true ),	( 27, 16, true ),	( 27, 16, true ),	( 25, 0, false ),	( 27, 16, true ),	( 27, 16, true ),	( 27, 16, true ),	( 27, 16, true ),	( 27, 16, true ),	( 27, 16, true ),	( 27, 16, true ),	( 27, 16, true ),	( 27, 16, true ),	( 27, 16, true ),	( 27, 16, true ),	( 27, 16, true ),	( 27, 16, true ),	( 27, 16, true ),	( 27, 16, false ),	( 28, 27, false )},
+            {( 27, 17, true ),	( 27, 17, true ),	( 27, 17, false ),	( 27, 17, true ),	( 27, 17, true ),	( 27, 17, true ),	( 27, 17, true ),	( 27, 17, true ),	( 26, 0, false ),	( 27, 17, true ),	( 27, 17, true ),	( 27, 17, true ),	( 27, 17, true ),	( 27, 17, true ),	( 27, 17, true ),	( 27, 17, true ),	( 27, 17, true ),	( 27, 17, true ),	( 27, 17, true ),	( 27, 17, true ),	( 27, 17, true ),	( 27, 17, true ),	( 27, 17, true ),	( 27, 17, false ),	( 28, 27, false )},
+            {( 27, 18, true ),	( 27, 18, true ),	( 27, 18, false ),	( 27, 18, true ),	( 27, 18, true ),	( 27, 18, true ),	( 27, 18, true ),	( 27, 18, true ),	( 27, 18, true ),	( 27, 18, true ),	( 27, 18, true ),	( 27, 18, true ),	( 27, 18, true ),	( 27, 18, true ),	( 27, 18, true ),	( 27, 18, true ),	( 27, 18, true ),	( 27, 18, true ),	( 27, 18, true ),	( 27, 18, true ),	( 27, 18, true ),	( 27, 18, true ),	( 27, 18, true ),	( 27, 18, false ),	( 28, 27, false )},
+            {( 27, 19, true ),	( 27, 19, true ),	( 27, 19, false ),	( 27, 19, true ),	( 27, 19, true ),	( 27, 19, true ),	( 27, 19, true ),	( 27, 19, true ),	( 27, 19, true ),	( 27, 19, true ),	( 27, 19, true ),	( 27, 19, true ),	( 27, 19, true ),	( 27, 19, true ),	( 27, 19, true ),	( 27, 19, true ),	( 27, 19, true ),	( 27, 19, true ),	( 27, 19, true ),	( 27, 19, true ),	( 27, 19, true ),	( 27, 19, true ),	( 27, 19, true ),	( 27, 19, false ),	( 28, 27, false )},
+            {( 27, 20, true ),	( 27, 20, true ),	( 27, 20, false ),	( 27, 20, true ),	( 27, 20, true ),	( 27, 20, true ),	( 27, 20, true ),	( 27, 20, true ),	( 27, 20, true ),	( 27, 20, true ),	( 27, 20, true ),	( 27, 20, true ),	( 27, 20, true ),	( 27, 20, true ),	( 27, 20, true ),	( 27, 20, true ),	( 27, 20, true ),	( 27, 20, true ),	( 27, 20, true ),	( 27, 20, true ),	( 27, 20, true ),	( 27, 20, true ),	( 27, 20, true ),	( 27, 20, false ),	( 28, 27, false )},
+            {( 27, 21, true ),	( 27, 21, true ),	( 27, 21, false ),	( 27, 21, true ),	( 27, 21, true ),	( 27, 21, true ),	( 27, 21, true ),	( 27, 21, true ),	( 27, 21, true ),	( 27, 21, true ),	( 27, 21, true ),	( 27, 21, true ),	( 27, 21, true ),	( 27, 21, true ),	( 27, 21, true ),	( 27, 21, true ),	( 27, 21, true ),	( 27, 21, true ),	( 27, 21, true ),	( 27, 21, true ),	( 27, 21, true ),	( 27, 21, true ),	( 27, 21, true ),	( 27, 21, false ),	( 28, 27, false )},
+            {( 27, 22, true ),	( 27, 22, true ),	( 27, 22, false ),	( 27, 22, true ),	( 27, 22, true ),	( 27, 22, true ),	( 27, 22, true ),	( 27, 22, true ),	( 27, 22, true ),	( 27, 22, true ),	( 27, 22, true ),	( 27, 22, true ),	( 27, 22, true ),	( 27, 22, true ),	( 27, 22, true ),	( 27, 22, true ),	( 27, 22, true ),	( 27, 22, true ),	( 27, 22, true ),	( 27, 22, true ),	( 27, 22, true ),	( 27, 22, true ),	( 27, 22, true ),	( 27, 22, false ),	( 28, 27, false )},
+            {( 27, 23, true ),	( 27, 23, true ),	( 27, 23, false ),	( 27, 23, true ),	( 27, 23, true ),	( 27, 23, true ),	( 27, 23, true ),	( 27, 23, true ),	( 27, 23, true ),	( 27, 23, true ),	( 27, 23, true ),	( 27, 23, true ),	( 27, 23, true ),	( 27, 23, true ),	( 27, 23, true ),	( 27, 23, true ),	( 27, 23, true ),	( 27, 23, true ),	( 27, 23, true ),	( 27, 23, true ),	( 27, 23, true ),	( 27, 23, true ),	( 27, 23, true ),	( 27, 23, false ),	( 28, 27, false )},
+            {( 27, 24, true ),	( 27, 24, true ),	( 27, 24, false ),	( 27, 24, true ),	( 27, 24, true ),	( 27, 24, true ),	( 27, 24, true ),	( 27, 24, true ),	( 27, 24, true ),	( 27, 24, true ),	( 27, 24, true ),	( 27, 24, true ),	( 27, 24, true ),	( 27, 24, true ),	( 27, 24, true ),	( 27, 24, true ),	( 27, 24, true ),	( 27, 24, true ),	( 27, 24, true ),	( 27, 24, true ),	( 27, 24, true ),	( 27, 24, true ),	( 27, 24, true ),	( 27, 24, false ),	( 28, 27, false )},
+            {( 27, 25, true ),	( 27, 25, true ),	( 27, 25, false ),	( 27, 25, true ),	( 27, 25, true ),	( 27, 25, true ),	( 27, 25, true ),	( 27, 25, true ),	( 27, 25, true ),	( 27, 25, true ),	( 27, 25, true ),	( 27, 25, true ),	( 27, 25, true ),	( 27, 25, true ),	( 27, 25, true ),	( 27, 25, true ),	( 27, 25, true ),	( 27, 25, true ),	( 27, 25, true ),	( 27, 25, true ),	( 27, 25, true ),	( 27, 25, true ),	( 27, 25, true ),	( 27, 25, false ),	( 28, 27, false )},
         };
 
         public static List<Lexeme> Analyze(IEnumerable<string> lines)
@@ -121,58 +187,54 @@ namespace TAFL
                 lexemes.AddRange(AnalyzeLine(line, lineNumber));
                 lineNumber++;
             }
-
             return lexemes;
         }
-
         public static List<Lexeme> AnalyzeLine(string line, int lineNumber)
         {
             var lexemes = new List<Lexeme>();
             
             State currentState = State.S;
-            
             int start = 0;
-            int end = 0;
-            foreach (var ch in line)
+            State nextState;
+            int action;
+            bool b;
+            (int, int, bool) tuple;
+            Lexeme lexeme;
+            
+            for(int i = 0; i < line.Length; i++)
             {
-                end++;
-                var nextState = _table[(int) currentState, (int) TypeOf(ch)];
+                var charType =  TypeOf(line[i]);
+                tuple = _table[(int) currentState, (int) charType];
+                (nextState, action, b) = ((State) tuple.Item1, tuple.Item2, tuple.Item3);
+                lexeme = SemanticActions[action]?.Invoke(lineNumber, start, i, line.Substring(start, i - start));
+                if (lexeme != null)
+                {
+                    lexemes.Add(lexeme);
+                }
                 switch (nextState)
                 {
                     case State.Error:
-                        lexemes.Add(
-                            new Lexeme.Error(lineNumber, start, "Ошибка")
-                        );
-                        currentState = State.S;
-                        start = end;
-                        break;
+                        goto case State.Z;
                     case State.Z:
-                        lexemes.Add(
-                            _lexemeBuilders[(int) currentState](lineNumber, start, line.Substring(start,end))
-                        );
                         currentState = State.S;
-                        start = end;
+                        start = i;
                         break;
                     default:
                         currentState = nextState;
                         break;
                 }
-            }
 
-            if (currentState == State.S) return lexemes;
-            switch (_table[(int) currentState, (int) CharType.EndSign])
-            {
-                case State.Z:
-                    lexemes.Add(
-                        _lexemeBuilders[(int) currentState](lineNumber, start, line.Substring(start, end))
-                    );
-                    break;
-                case State.Error:
-                    lexemes.Add(
-                        new Lexeme.Error(lineNumber, start, "Ошибка")
-                    );
-                    break;
+                if (b) i--;
             }
+            (_, action, _) = _table[(int) currentState, (int) CharType.End];
+            lexeme = SemanticActions[action]?.Invoke(
+                lineNumber,
+                start,
+                line.Length,
+                line.Substring(start, line.Length - 1 - start)
+                );
+            
+            if (lexeme != null) lexemes.Add(lexeme);
 
             return lexemes;
         }
