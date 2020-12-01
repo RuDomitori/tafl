@@ -139,18 +139,6 @@ namespace TAFL
         {
             public Fn(int line, int start, int end) : base(line, start, end) {}
         }
-        public class Null: Lexeme
-        {
-            public Null(int line, int start, int end) : base(line, start, end) {}
-        }
-        public class False: Lexeme
-        {
-            public False(int line, int start, int end) : base(line, start, end) {}
-        }
-        public class True: Lexeme
-        {
-            public True(int line, int start, int end) : base(line, start, end) {}
-        }
         public class Return: Lexeme
         {
             public Return(int line, int start, int end) : base(line, start, end) {}

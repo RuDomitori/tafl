@@ -113,9 +113,6 @@ namespace TAFL
                 "fn" => new Lexeme.Fn(line, start, end),
                 "return" => new Lexeme.Return(line, start, end),
                 "var" => new Lexeme.Var(line, start, end),
-                "null" => new Lexeme.Null(line, start, end),
-                "false" => new Lexeme.False(line, start, end),
-                "true" => new Lexeme.True(line, start, end),
                 _ => new Lexeme.Identifier(line, start, end, word)
             },
             (line, start, end, word) => new Lexeme.Const(line, start, end, word),
