@@ -15,7 +15,7 @@ namespace TAFL
 
             foreach (var lexeme in res)
             {
-                Console.WriteLine(lexeme);
+                Console.WriteLine(lexeme.Type);
             }
         }
     }
