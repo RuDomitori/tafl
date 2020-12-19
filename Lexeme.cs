@@ -21,6 +21,7 @@ namespace TAFL
             this.Word = word;
             this.Value = value;
         }
+        public static implicit operator int(Lexeme lexeme) => (int) lexeme.Type;
     }
 
     public enum LexemeType
@@ -57,6 +58,7 @@ namespace TAFL
         Var,
         Fn,
         Return,
+        EoF,
         Error
     }
 }
