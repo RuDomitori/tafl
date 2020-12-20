@@ -203,6 +203,7 @@ namespace TAFL
             
             for(int i = 0; i < line.Length; i++)
             {
+                if (currentState == State.S) start = i;
                 var charType = TypeOf(line[i]);
                 var tuple = _GetCell(currentState, charType);
                 (nextState, actionNumber, b) = ((State) tuple.Item1, tuple.Item2, tuple.Item3);
@@ -216,7 +217,7 @@ namespace TAFL
                         );
                 if (lexeme != null) lexemes.Add(lexeme);
                 
-                if (b) i--;
+                
                 
                 switch (nextState)
                 {
@@ -224,12 +225,13 @@ namespace TAFL
                         goto case State.Z;
                     case State.Z:
                         currentState = State.S;
-                        start = i;
                         break;
                     default:
                         currentState = nextState;
                         break;
                 }
+                
+                if (b) i--;
             }
             
             (_, actionNumber, _) = _GetCell(currentState, CharType.End);

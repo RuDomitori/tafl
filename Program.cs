@@ -8,8 +8,8 @@ namespace TAFL
         {
             var res = Lexer.Analyze(new[]
             {
-                "fn t(a, b, c, d) while(a > 0){" +
-                "var ed;" +
+                "fn a(a,b) while a > 0 {" +
+                "var a;" +
                 "}"
             });
             foreach (var lexeme in res)
