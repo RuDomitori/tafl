@@ -21,6 +21,7 @@ namespace TAFL
             this.Word = word;
             this.Value = value;
         }
+        public static implicit operator int(Lexeme lexeme) => (int) lexeme.Type;
     }
 
     public enum LexemeType
@@ -38,17 +39,17 @@ namespace TAFL
         LeftSquareBracket,
         RightSquareBracket,
         Comma,
-        Not,
-        GreaterThan,
-        LessThan,
-        Or,
-        And,
-        LeftCurlyBracket,
-        RightCurlyBracket,
         EqualTo,
         NotEqualTo,
+        GreaterThan,
+        LessThan,
         GreaterThanOrEqualTo,
         LessThanOrEqualTo,
+        Or,
+        And,
+        Not,
+        LeftCurlyBracket,
+        RightCurlyBracket,
         Read,
         Write,
         While,
@@ -57,6 +58,7 @@ namespace TAFL
         Var,
         Fn,
         Return,
+        EoF,
         Error
     }
 }

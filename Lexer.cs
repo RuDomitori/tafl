@@ -5,6 +5,7 @@ namespace TAFL
 {
     public static class Lexer
     {
+
         private enum State
         {
             S,
@@ -175,6 +176,8 @@ namespace TAFL
             {( 27, 25, true ),	( 27, 25, true ),	( 27, 25, false ),	( 27, 25, true ),	( 27, 25, true ),	( 27, 25, true ),	( 27, 25, true ),	( 27, 25, true ),	( 27, 25, true ),	( 27, 25, true ),	( 27, 25, true ),	( 27, 25, true ),	( 27, 25, true ),	( 27, 25, true ),	( 27, 25, true ),	( 27, 25, true ),	( 27, 25, true ),	( 27, 25, true ),	( 27, 25, true ),	( 27, 25, true ),	( 27, 25, true ),	( 27, 25, true ),	( 27, 25, true ),	( 27, 25, false ),	( 28, 27, false )},
         };
 
+        private static (int, int, bool) _GetCell(State state, CharType charType) => _table[(int) state, (int) charType];
+        
         public static List<Lexeme> Analyze(IEnumerable<string> lines)
         {
             var lexemes = new List<Lexeme>();
@@ -194,44 +197,51 @@ namespace TAFL
             State currentState = State.S;
             int start = 0;
             State nextState;
-            int action;
+            int actionNumber;
             bool b;
-            (int, int, bool) tuple;
             Lexeme lexeme;
             
             for(int i = 0; i < line.Length; i++)
             {
-                var charType =  TypeOf(line[i]);
-                tuple = _table[(int) currentState, (int) charType];
-                (nextState, action, b) = ((State) tuple.Item1, tuple.Item2, tuple.Item3);
-                lexeme = SemanticActions[action]?.Invoke(lineNumber, start, i, line.Substring(start, i - start));
-                if (lexeme != null)
-                {
-                    lexemes.Add(lexeme);
-                }
+                if (currentState == State.S) start = i;
+                var charType = TypeOf(line[i]);
+                var tuple = _GetCell(currentState, charType);
+                (nextState, actionNumber, b) = ((State) tuple.Item1, tuple.Item2, tuple.Item3);
+                
+                lexeme = SemanticActions[actionNumber]
+                    ?.Invoke(
+                        lineNumber,
+                        start, 
+                        i,
+                        line.Substring(start, i - start)
+                        );
+                if (lexeme != null) lexemes.Add(lexeme);
+                
+                
+                
                 switch (nextState)
                 {
                     case State.Error:
                         goto case State.Z;
                     case State.Z:
                         currentState = State.S;
-                        start = i;
                         break;
                     default:
                         currentState = nextState;
                         break;
                 }
-
+                
                 if (b) i--;
             }
-            (_, action, _) = _table[(int) currentState, (int) CharType.End];
-            lexeme = SemanticActions[action]?.Invoke(
+            
+            (_, actionNumber, _) = _GetCell(currentState, CharType.End);
+            
+            lexeme = SemanticActions[actionNumber]?.Invoke(
                 lineNumber,
                 start,
                 line.Length,
-                line.Substring(start, line.Length - 1 - start)
+                line.Substring(start, line.Length - start)
                 );
-            
             if (lexeme != null) lexemes.Add(lexeme);
 
             return lexemes;
