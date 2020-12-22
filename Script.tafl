@@ -1,47 +1,41 @@
-var i = 0;
-fn Out()
-{
-    read i; 
-    var k = 0;
-    var arr = [i];
-    while (k<i)
-    {
-        read arr[k];
-	    k = k+1;
+fn ReadArr(n) {
+    var i = 0;
+    var arr = [n];
+    while i < n {
+        read arr[i];
+	    i = i + 1;
     }
     return arr;
 }
-var arr2 = Out();
-write arr2;
-write i;
-fn Shell (a, n)
-{
-    var h=1;
-    while (h<=n/9)
-    {
-        h = (h*3)+1;
+fn Shell (arr, n) {
+    var h = 1;
+    while h <= n / 9 {
+        h = (h * 3) + 1;
     }
-    while (h>=1)
-    {
+    while h >= 1 {
         var i = h;
-        while (i<n)
-        {
-            var j = i-h;
-            while (j>=0)
-            {
-                if (a[j]>a[j+h])
-                {
-                    var temp = a[j];
-                    a[j] = a[j+h];
-                    a[j+h] = temp;
+        
+        while i < n {
+            var j = i - h;
+            
+            while j >= 0 {
+                if arr[j] > arr[j + h] {
+                    var temp = arr[j];
+                    arr[j] = arr[j + h];
+                    arr[j + h] = temp;
                 }
-                j = j-h;
+                j = j - h;
             }
-            i = i+1;
+            i = i + 1;
         }
-        h = (h-1)/3;
+        h = (h - 1) / 3;
     }
 }
+var n;
+read n;
+var arr = ReadArr(n);
 
-Shell (arr2,i);
-write arr2;
+write n, arr;
+
+Shell (arr, n);
+write arr;
