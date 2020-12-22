@@ -1,0 +1,10 @@
+var a;
+read a;
+
+if a > 0 {
+    write a;
+}
+else if a == -1{
+    write -100;
+}
+write [5] + 999;
