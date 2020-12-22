@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO.Enumeration;
 
 namespace TAFL
@@ -25,7 +26,7 @@ namespace TAFL
             {
                 var line = Console.ReadLine();
                 foreach (var str in line.Split(' '))
-                    yield return Double.Parse(str);
+                    yield return Double.Parse(str, CultureInfo.InvariantCulture);
             }
         }
 

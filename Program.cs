@@ -15,7 +15,6 @@ namespace TAFL
                 Console.WriteLine("Файл не найден");
                 return;
             }
-            Console.WriteLine(args.Length);
             var lines = File.ReadAllLines(args[0]);
             var res = Lexer.Analyze(lines);
             var ops = OPSGenerator.GenerateOPS(res);

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace TAFL
 {
@@ -117,8 +118,8 @@ namespace TAFL
                 "var" => new Lexeme(LexemeType.Var, line, start, end),
                 _ => new Lexeme(LexemeType.Identifier, line, start, end, word)
             },
-            (line, start, end, word) => new Lexeme(LexemeType.Const,line, start, end, value: Double.Parse(word)),
-            (line, start, end, word) => new Lexeme(LexemeType.Const,line, start, end, value: Double.Parse(word)),
+            (line, start, end, word) => new Lexeme(LexemeType.Const,line, start, end, value: Double.Parse(word, CultureInfo.InvariantCulture)),
+            (line, start, end, word) => new Lexeme(LexemeType.Const,line, start, end, value: Double.Parse(word, CultureInfo.InvariantCulture)),
             (line, start, end, word) => new Lexeme(LexemeType.Summation,line, start, end),
             (line, start, end, word) => new Lexeme(LexemeType.Subtraction,line, start, end),
             (line, start, end, word) => new Lexeme(LexemeType.Multiplication,line, start, end),
